@@ -9,7 +9,8 @@ datasets = {
 datasets_path ={
     "UCF":"D://UCF-101",
     "HMDB":"/",
-    "Something":"/"
+    "SomethingData":"/"
+    "SomethingAnnotation":"./something"
 
 }
 
