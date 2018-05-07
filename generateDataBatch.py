@@ -1,11 +1,17 @@
 from config import *
+import os
 
 class somethingBatch():
-    def __init__(self, label, train, test, validation):
+    def __init__(self, label, train, test, validation, datapath):
         self.labels = self._parse_labels(label)#type: dict
         self.training_sample = self._parse_train(train)#type: dict
         self.validation_sample = self._parse_train(validation)#type: dict
         self.test_sample = self._parse_test(test)#type: list
+        self.last_sample_pos = 0
+        self.training_sample_number = len(self.training_sample)
+        self.validation_sample_number = len(self.validation_sample)
+        self.test_sample_number = len(self.test_sample)
+        self.trained_ratio = 0 #trained sample number divide total training sample number, may > 1.0
 
 
     def _parse_labels(self, label):
@@ -38,8 +44,12 @@ class somethingBatch():
                     result.append(line)
         return result
 
+    def _sample_single_video(self, videoID):
+        pass
 
-test = somethingBatch(datasets_path["SomethingLabel"],datasets_path["SomethingTrain"],datasets_path["SomethingTest"],datasets_path["SomethingValidation"])
+
+
+test = somethingBatch(datasets_path["SomethingLabel"],datasets_path["SomethingTrain"],datasets_path["SomethingTest"],datasets_path["SomethingValidation"],datasets_path["SomethingData"])
 
 print(test.training_sample["100218"])
 print(test.training_sample["48032"])
