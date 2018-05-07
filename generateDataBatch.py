@@ -39,7 +39,11 @@ class somethingBatch():
         return result
 
 
-test = somethingBatch("./something/something-something-v1-labels.csv","./something/something-something-v1-train.csv","./something/something-something-v1-validation.csv","./something/something-something-v1-test.csv")
+test = somethingBatch(datasets_path["SomethingLabel"],datasets_path["SomethingTrain"],datasets_path["SomethingTest"],datasets_path["SomethingValidation"])
 
 print(test.training_sample["100218"])
 print(test.training_sample["48032"])
+print(test.validation_sample["85"])
+print(test.validation_sample["1753"])
+print(test.validation_sample["90751"])
+print(test.validation_sample["24413"])

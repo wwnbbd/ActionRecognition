@@ -1,5 +1,6 @@
 #some basic configuration
 
+#the number of classes for every datasets
 datasets = {
     "UCF":101,
     "HMDB":51,
@@ -10,7 +11,11 @@ datasets_path ={
     "UCF":"D://UCF-101",
     "HMDB":"/",
     "SomethingData":"/",
-    "SomethingAnnotation":"./something"
+    "SomethingAnnotation":"./something",
+    "SomethingLabel":"./something/something-something-v1-labels.csv",
+    "SomethingTrain":"./something/something-something-v1-train.csv",
+    "SomethingValidation":"./something/something-something-v1-validation.csv",
+    "SomethingTest":"./something/something-something-v1-test.csv"
 
 }
 
