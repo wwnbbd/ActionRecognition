@@ -20,8 +20,8 @@ datasets_path ={
 
 }
 
-pretrained_params_path = {'resnet50':'~/pretrained_model/resnet50-19c8e357.pth'}
+pretrained_params_path = {'resnet50':'/media/disk1/wangwanneng/pretrained_model/resnet50-19c8e357.pth'}
 
-check_points_path = "~/checkpoint_path/"
+check_points_path = "/media/disk1/wangwanneng/checkpoint_path/"
 
 number_of_frames_per_video = 15
