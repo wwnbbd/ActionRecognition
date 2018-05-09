@@ -149,7 +149,9 @@ class somethingBatch():
         for i in range(batch_size):
             gt[i] = self.training_sample[self.training_list[self.last_sample_pos]]
             data.append(self._sample_single_video(self.training_list[self.last_sample_pos]))
-
+        data = torch.cat(data)
+        gt = torch.LongTensor(gt)
+        data = data.type(torch.float)
         return torch.cat(data),torch.LongTensor(gt)
 
 
