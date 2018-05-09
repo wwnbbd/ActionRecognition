@@ -61,7 +61,7 @@ class somethingBatch():
         #read in all the sampled frames
         minivideo = io.imread(video_path + selected_files[0])#shape: height * width * channel
         for i in range(1,len(selected_files)):
-            minivideo = np.concatenate((minivideo, io.imread(selected_files[i])),axis=2)
+            minivideo = np.concatenate((minivideo, io.imread(video_path+selected_files[i])),axis=2)
         
         #minivideo shape: height * width * channel (also PIL image format)
         tsfm = transforms.Compose([transforms.Resize(256), transforms.RandomCrop(224), transforms.RandomHorizontalFlip(), transforms.ToTensor(), transforms.Normalize(mean=[0.485, 0.456, 0.406]*15, std=[0.229, 0.224, 0.225]*15)])
