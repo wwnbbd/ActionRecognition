@@ -16,6 +16,8 @@ class somethingBatch():
         self.validation_sample_number = len(self.validation_sample)
         self.test_sample_number = len(self.test_sample)
         self.trained_ratio = 0 #trained sample number divide total training sample number, may > 1.0
+        self.training_list = list(self.training_sample.keys())
+        self.validation_list = list(self.validation_sample.keys())
 
 
     def _parse_labels(self, label):
@@ -72,8 +74,16 @@ class somethingBatch():
         self.trained_ratio += 1/self.training_sample_number
         return minivideo_transformed
 
-    def get_batch(self, batch_size):
-        pass
+
+    def get_training_batch(self, batch_size):#batch size indicates how many videos in a batch not the number of frames
+        data = []
+        gt = [0] * batch_size
+        for i in range(batch_size):
+            gt[i] = self.training_sample[self.training_list[self.last_sample_pos]]
+            data.append(self._sample_single_video(self.training_list[self.last_sample_pos]))
+
+        return torch.cat(data),torch.LongTensor(gt)
+
 
         
 
