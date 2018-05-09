@@ -1,8 +1,9 @@
 from config import *
 import os
 import random
-from skimage import io,transform
+from skimage import io
 import numpy as np
+from torchvision import transforms
 
 class somethingBatch():
     def __init__(self, label, train, test, validation, datapath):
@@ -61,9 +62,13 @@ class somethingBatch():
             minivideo = np.concatenate((minivideo, io.imread(selected_files[i])),axis=2)
         
         #minivideo shape: height * width * channel (also PIL image format)
+        tsfm = transforms.Compose([transforms.Scale(256), transforms.RandomCrop(224), transforms.RandomHorizontalFlip(), transforms.ToTensor(), transforms.Normalize(mean=[0.485, 0.456, 0.406]*15, std=[0.229, 0.224, 0.225]*15)])
+        #default require grad is false
+        minivideo_transformed = tsfm(minivideo)#normalization mean and std which is from imagenet
+
+        #add extra axis
+        minivideo_transformed.unsqueeze_(0).view(-1,3,224,224).contiguous()
         
-
-
 
 
 
@@ -76,7 +81,3 @@ print(test.validation_sample["1753"])
 print(test.validation_sample["90751"])
 print(test.validation_sample["24413"])
 
-a = np.random.rand(224*224*12).reshape((224,224,12))
-a.transpose(2,0,1)
-c = transform.resize(a,(256,256))
-print(c.shape)
