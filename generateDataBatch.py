@@ -89,12 +89,5 @@ class somethingBatch():
 
 
 
-test = somethingBatch(datasets_path["SomethingLabel"],datasets_path["SomethingTrain"],datasets_path["SomethingTest"],datasets_path["SomethingValidation"],datasets_path["SomethingData"])
 
-print(test.training_sample["100218"])
-print(test.training_sample["48032"])
-print(test.validation_sample["85"])
-print(test.validation_sample["1753"])
-print(test.validation_sample["90751"])
-print(test.validation_sample["24413"])
 

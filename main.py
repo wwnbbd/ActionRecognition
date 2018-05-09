@@ -2,7 +2,7 @@ import torch
 import time
 from model import Net
 from config import pretrained_params_path
-from torch.optim as optim
+import torch.optim as optim
 from generateDataBatch import somethingBatch
 from config import *
 import torch.nn as nn
@@ -23,8 +23,8 @@ something_something = somethingBatch(datasets_path["SomethingLabel"],datasets_pa
 
 #use multigpu or not
 if torch.cuda.device_count() > 1:
-  print("Let's use", torch.cuda.device_count(), "GPUs!")
-  model_something = nn.DataParallel(model_something)
+    print("Let's use", torch.cuda.device_count(), "GPUs!")
+    model_something = nn.DataParallel(model_something)
 
 #transfer to GPUs
 model_something.to(device)
