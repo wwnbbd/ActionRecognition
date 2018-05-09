@@ -62,12 +62,19 @@ class somethingBatch():
             minivideo = np.concatenate((minivideo, io.imread(selected_files[i])),axis=2)
         
         #minivideo shape: height * width * channel (also PIL image format)
-        tsfm = transforms.Compose([transforms.Scale(256), transforms.RandomCrop(224), transforms.RandomHorizontalFlip(), transforms.ToTensor(), transforms.Normalize(mean=[0.485, 0.456, 0.406]*15, std=[0.229, 0.224, 0.225]*15)])
-        #default require grad is false
+        tsfm = transforms.Compose([transforms.Resize(256), transforms.RandomCrop(224), transforms.RandomHorizontalFlip(), transforms.ToTensor(), transforms.Normalize(mean=[0.485, 0.456, 0.406]*15, std=[0.229, 0.224, 0.225]*15)])
+        #torch tensor default require grad is false
         minivideo_transformed = tsfm(minivideo)#normalization mean and std which is from imagenet
-
         #add extra axis
         minivideo_transformed.unsqueeze_(0).view(-1,3,224,224).contiguous()
+
+        self.last_sample_pos = (self.last_sample_pos + 1) % self.training_sample_number
+        self.trained_ratio += 1/self.training_sample_number
+        return minivideo_transformed
+
+    def get_batch(self, batch_size):
+        pass
+
         
 
 
