@@ -20,7 +20,7 @@ datasets_path ={
 
 }
 
-pretrained_params_path = {'resnet50':'./resnet50-19c8e357.pth'}
+pretrained_params_path = {'resnet50':'~/pretrained_model/resnet50-19c8e357.pth'}
 
 check_points_path = "~/checkpoint_path/"
 

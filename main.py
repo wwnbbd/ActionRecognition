@@ -7,6 +7,7 @@ from generateDataBatch import somethingBatch
 from config import *
 import torch.nn as nn
 import time
+from utils import load_pretrain_model
 
 
 #pytorch在LSTM上有很多坑
@@ -18,7 +19,7 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 #get model
 model_something = Net(dataset_name="Something",dropout_ratio=0.7)
-
+load_pretrain_model(model_something)
 #get data generator
 something_something = somethingBatch(datasets_path["SomethingLabel"],datasets_path["SomethingTrain"],datasets_path["SomethingTest"],datasets_path["SomethingValidation"],datasets_path["SomethingData"])
 
@@ -37,10 +38,10 @@ optimizer = optim.SGD(model_something.parameters(), lr=0.01)
 criterion = nn.CrossEntropyLoss()
 
 #training
-for i in range(1000):
+for i in range(10000):
     start = time.time()
     optimizer.zero_grad()
-    input_data,target_data = something_something.get_training_batch(4)
+    input_data,target_data = something_something.get_training_batch(10)
     input_data = input_data.to(device)
     target_data = target_data.to(device)
     low_out, high_out, space_out = model_something(input_data)
@@ -52,7 +53,7 @@ for i in range(1000):
     print(loss.item())
     optimizer.step()
     end = time.time()
-    print("Iteration %d costs %d".format(i, end-start))
+    print("Iteration {} : costs {} seconds".format(i, end-start))
 
 
 
