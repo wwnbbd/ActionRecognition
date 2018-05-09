@@ -152,7 +152,7 @@ class somethingBatch():
         data = torch.cat(data)
         gt = torch.LongTensor(gt)
         data = data.type(torch.float)
-        return torch.cat(data),torch.LongTensor(gt)
+        return data, gt
 
 
         
