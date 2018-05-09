@@ -13,7 +13,7 @@ import torch.nn as nn
 #data_in = torch.randn((45,3,224,224), requires_grad=False)#一定要写volatile=True且forward的时候一定要,还要加eval（）这样训练的时候一定加train,
 
 #define device
-device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 #get model
 model_something = Net(dataset_name="Something",dropout_ratio=0.7)
