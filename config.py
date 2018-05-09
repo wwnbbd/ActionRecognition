@@ -22,6 +22,6 @@ datasets_path ={
 
 pretrained_params_path = {'resnet50':'./resnet50-19c8e357.pth'}
 
-check_points_path = "/"
+check_points_path = "~/checkpoint_path"
 
 number_of_frames_per_video = 15
