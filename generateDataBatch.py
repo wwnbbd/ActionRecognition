@@ -129,7 +129,7 @@ class somethingBatch():
         minivideo = rescale(minivideo)
         minivideo = crop(minivideo)
         if random.random() > 0.5:
-            minivideo = minivideo[:,::-1,:]
+            minivideo = minivideo[:,::-1,:].copy()
         #minivideo shape: height * width * channel (also PIL image format)
         tsfm = transforms.Compose([transforms.ToTensor(), transforms.Normalize(mean=[0.485, 0.456, 0.406]*15, std=[0.229, 0.224, 0.225]*15)])
         #torch tensor default require grad is false
