@@ -4,6 +4,7 @@ import random
 from skimage import io
 import numpy as np
 from torchvision import transforms
+from PIL import Image
 
 class somethingBatch():
     def __init__(self, label, train, test, validation, datapath):
@@ -62,7 +63,7 @@ class somethingBatch():
         minivideo = io.imread(video_path + selected_files[0])#shape: height * width * channel
         for i in range(1,len(selected_files)):
             minivideo = np.concatenate((minivideo, io.imread(video_path + selected_files[i])),axis=2)
-        
+        minivideo = Image.fromarray(minivideo)
         #minivideo shape: height * width * channel (also PIL image format)
         tsfm = transforms.Compose([transforms.Scale(256), transforms.RandomCrop(224), transforms.RandomHorizontalFlip(), transforms.ToTensor(), transforms.Normalize(mean=[0.485, 0.456, 0.406]*15, std=[0.229, 0.224, 0.225]*15)])
         #torch tensor default require grad is false
