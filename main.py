@@ -43,8 +43,11 @@ for i in range(1000):
     input_data,target_data = something_something.get_training_batch(4)
     input_data = input_data.to(device)
     target_data = target_data.to(device)
-    output = model_something(input_data)
-    loss = criterion(output,target_data)
+    low_out, high_out, space_out = model_something(input_data)
+    loss_low = criterion(low_out,target_data)
+    loss_high = criterion(high_out,target_data)
+    loss_space = criterion(space_out,target_data)
+    loss = loss_low + loss_high + loss_space
     loss.backward()
     print(loss.item())
     optimizer.step()

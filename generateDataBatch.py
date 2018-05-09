@@ -4,6 +4,7 @@ import random
 from skimage import io,transform
 import numpy as np
 from torchvision import transforms
+import torch
 
 #basic transform class
 class Rescale(object):
