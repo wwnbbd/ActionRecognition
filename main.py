@@ -6,6 +6,7 @@ import torch.optim as optim
 from generateDataBatch import somethingBatch
 from config import *
 import torch.nn as nn
+import time
 
 
 #pytorch在LSTM上有很多坑
@@ -37,6 +38,7 @@ criterion = nn.CrossEntropyLoss()
 
 #training
 for i in range(1000):
+    start = time.time()
     optimizer.zero_grad()
     input_data,target_data = something_something.get_training_batch(4)
     input_data = input_data.to(device)
@@ -44,7 +46,10 @@ for i in range(1000):
     output = model_something(input_data)
     loss = criterion(output,target_data)
     loss.backward()
+    print(loss.item())
     optimizer.step()
+    end = time.time()
+    print("Iteration %d costs %d".format(i, end-start))
 
 
 
