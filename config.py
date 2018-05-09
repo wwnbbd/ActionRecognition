@@ -7,10 +7,11 @@ datasets = {
     "Something":174
 }
 
+#basic path for datasets
 datasets_path ={
     "UCF":"D://UCF-101",
-    "HMDB":"/",
-    "SomethingData":"/",
+    "HMDB":"",
+    "SomethingData":"/media/disk1/wangwanneng/datasets/something_something/data/20bn-something-something-v1/",
     "SomethingAnnotation":"./something",
     "SomethingLabel":"./something/something-something-v1-labels.csv",
     "SomethingTrain":"./something/something-something-v1-train.csv",
@@ -22,3 +23,5 @@ datasets_path ={
 pretrained_params_path = {'resnet50':'./resnet50-19c8e357.pth'}
 
 check_points_path = "/"
+
+number_of_frames_per_video = 15

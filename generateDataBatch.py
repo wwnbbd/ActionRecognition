@@ -1,5 +1,8 @@
 from config import *
 import os
+import random
+from skimage import io,transform
+import numpy as np
 
 class somethingBatch():
     def __init__(self, label, train, test, validation, datapath):
@@ -44,8 +47,23 @@ class somethingBatch():
                     result.append(line)
         return result
 
-    def _sample_single_video(self, videoID):
-        pass
+    #this function return pytorch tensor
+    def _sample_single_video(self, videoID):#video Id should be a string
+        #first count the number of frames in the folder
+        video_path = datasets_path["SomethingData"] + videoID + "/"
+        all_files = os.listdir(video_path)
+        selected_files = random.sample(all_files, number_of_frames_per_video)
+        selected_files.sort()#all the selected files are in ascending order
+
+        #read in all the sampled frames
+        minivideo = io.imread(video_path + selected_files[0])#shape: height * width * channel
+        for i in range(1,len(selected_files)):
+            minivideo = np.concatenate((minivideo, io.imread(selected_files[i])),axis=2)
+        
+        #minivideo shape: height * width * channel (also PIL image format)
+        
+
+
 
 
 
@@ -57,3 +75,8 @@ print(test.validation_sample["85"])
 print(test.validation_sample["1753"])
 print(test.validation_sample["90751"])
 print(test.validation_sample["24413"])
+
+a = np.random.rand(224*224*12).reshape((224,224,12))
+a.transpose(2,0,1)
+c = transform.resize(a,(256,256))
+print(c.shape)
