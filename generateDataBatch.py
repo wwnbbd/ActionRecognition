@@ -136,7 +136,7 @@ class somethingBatch():
         #torch tensor default require grad is false
         minivideo_transformed = tsfm(minivideo)#normalization mean and std which is from imagenet
         #add extra axis
-        minivideo_transformed.unsqueeze_(0).view(-1,3,224,224).contiguous_()
+        minivideo_transformed = minivideo_transformed.unsqueeze_(0).view(-1,3,224,224).contiguous()
 
         self.last_sample_pos = (self.last_sample_pos + 1) % self.training_sample_number
         self.trained_ratio += 1/self.training_sample_number
