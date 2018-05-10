@@ -7,7 +7,7 @@ from generateDataBatch import somethingBatch
 from config import *
 import torch.nn as nn
 import time
-from utils import load_pretrain_model
+from utils import load_pretrain_model,save_checkpoint, load_checkpoint
 
 
 #pytorch在LSTM上有很多坑
@@ -32,7 +32,7 @@ if torch.cuda.device_count() > 1:
 model_something.to(device)
 
 #define optimzer
-optimizer = optim.SGD(model_something.parameters(), lr=0.01)
+optimizer = optim.Adam(model_something.parameters(), lr=0.001,weight_decay=0.00001)
 
 #define loss function
 criterion = nn.CrossEntropyLoss()
@@ -41,7 +41,7 @@ criterion = nn.CrossEntropyLoss()
 for i in range(10000):
     start = time.time()
     optimizer.zero_grad()
-    input_data,target_data = something_something.get_training_batch(10)
+    input_data,target_data = something_something.get_training_batch(14)
     input_data = input_data.to(device)
     target_data = target_data.to(device)
     low_out, high_out, space_out = model_something(input_data)
@@ -54,6 +54,9 @@ for i in range(10000):
     optimizer.step()
     end = time.time()
     print("Iteration {} : costs {} seconds".format(i, end-start))
+    if i % 6144 == 0:
+        parameter_path = check_points_path + str(i) +".pth"
+        save_checkpoint(model_something, parameter_path)
 
 
 
