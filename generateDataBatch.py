@@ -5,7 +5,7 @@ from skimage import io,transform
 import numpy as np
 from torchvision import transforms
 import torch
-import time 
+import multiprocessing as mp
 
 #basic transform class
 class Rescale(object):
@@ -121,12 +121,9 @@ class somethingBatch():
         selected_files.sort()#all the selected files are in ascending order
 
         #read in all the sampled frames
-        start = time.time()
         minivideo = io.imread(video_path + selected_files[0])#shape: height * width * channel
         for i in range(1,len(selected_files)):
             minivideo = np.concatenate((minivideo, io.imread(video_path + selected_files[i])),axis=2)
-        end = time.time()
-        print("read images using {} seconds".format(end-start))
 
         rescale = Rescale(256)
         crop = RandomCrop(224)
@@ -135,9 +132,6 @@ class somethingBatch():
         minivideo = crop(minivideo)
         if random.random() > 0.5:
             minivideo = minivideo[:,::-1,:].copy()
-        trans1 = time.time()
-        print("transforms {} seconds".format(trans1 - end))
-
         
         #minivideo shape: height * width * channel (also PIL image format)
         tsfm = transforms.Compose([transforms.ToTensor(), transforms.Normalize(mean=[0.485, 0.456, 0.406]*15, std=[0.229, 0.224, 0.225]*15)])
@@ -145,21 +139,33 @@ class somethingBatch():
         minivideo_transformed = tsfm(minivideo)#normalization mean and std which is from imagenet
         #add extra axis
         minivideo_transformed = minivideo_transformed.unsqueeze_(0).view(-1,3,224,224).contiguous()
-        print("trans2 {} seconds".format(time.time() - trans1))
-        self.last_sample_pos = (self.last_sample_pos + 1) % self.training_sample_number
-        self.trained_ratio += 1/self.training_sample_number
+
+        
         return minivideo_transformed
 
 
     def get_training_batch(self, batch_size):#batch size indicates how many videos in a batch not the number of frames
-        data = []
-        gt = [0] * batch_size
+        #data = []
+        #gt = [0] * batch_size
+        #for i in range(batch_size):
+        #    gt[i] = self.training_sample[self.training_list[self.last_sample_pos]]
+        #    data.append(self._sample_single_video(self.training_list[self.last_sample_pos]))
+        
+        ids = []
+        gt = []
         for i in range(batch_size):
-            gt[i] = self.training_sample[self.training_list[self.last_sample_pos]]
-            data.append(self._sample_single_video(self.training_list[self.last_sample_pos]))
+            ids.append(self.training_list[(self.last_sample_pos + i) % self.training_sample_number])
+            gt.append(self.training_sample[self.training_list[(self.last_sample_pos + i) % self.training_sample_number]])
+
+        pool = mp.Pool(processes=batch_size)
+        data = pool.map(self._sample_single_video, ids)
+        
         data = torch.cat(data)
         gt = torch.LongTensor(gt)
         data = data.type(torch.float)
+
+        self.last_sample_pos = (self.last_sample_pos + batch_size) % self.training_sample_number
+        self.trained_ratio += batch_size/self.training_sample_number
         return data, gt
 
 
