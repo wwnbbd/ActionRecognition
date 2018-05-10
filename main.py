@@ -60,6 +60,9 @@ criterion = nn.CrossEntropyLoss()
 
 #training
 for i in range(args.epoch):
+    #change learning rate for every epoch
+    optimizer = optim.Adam(model_something.parameters(), lr=args.lr*pow(10,i),weight_decay=0.00001)
+
     for batch_number, batch_data in enumerate(something_loader):
         start = time.time()
         optimizer.zero_grad()
@@ -88,7 +91,6 @@ for i in range(args.epoch):
             parameter_path = check_points_path + str(i) + "-" + str(batch_number)+".pth"
             save_checkpoint(model_something, parameter_path)
 
-        #change learning rate
 
 
 
