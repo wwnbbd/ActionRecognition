@@ -5,8 +5,10 @@ from skimage import io,transform
 import numpy as np
 from torchvision import transforms
 import torch
-import multiprocessing as mp
+from torch.utils.data import Dataset, DataLoader
 import time
+import warnings
+warnings.filterwarnings("ignore")
 
 #basic transform class
 class Rescale(object):
@@ -68,20 +70,12 @@ class RandomCrop(object):
 
 
 
-class somethingBatch():
-    def __init__(self, label, train, test, validation, datapath):
+class somethingBatch(Dataset):
+    def __init__(self, label, train, datapath):
         self.labels = self._parse_labels(label)#type: dict
         self.training_sample = self._parse_train(train)#type: dict
-        self.validation_sample = self._parse_train(validation)#type: dict
-        self.test_sample = self._parse_test(test)#type: list
-        self.last_sample_pos = 0
         self.training_sample_number = len(self.training_sample)
-        self.validation_sample_number = len(self.validation_sample)
-        self.test_sample_number = len(self.test_sample)
-        self.trained_ratio = 0 #trained sample number divide total training sample number, may > 1.0
         self.training_list = list(self.training_sample.keys())
-        self.validation_list = list(self.validation_sample.keys())
-
 
     def _parse_labels(self, label):
         eng2num = dict()#generate dict
@@ -104,19 +98,13 @@ class somethingBatch():
                     video_dir_id_pair[parts[0]] = self.labels[0][parts[1]] 
         return video_dir_id_pair
 
-    def _parse_test(self, test):
-        result = []
-        with open(test) as f:
-            lines = f.readlines()
-            for line in lines:
-                if line != "":
-                    result.append(line)
-        return result
+    def __len__(self):
+        return self.training_sample_number
 
-    #this function return pytorch tensor
-    def _sample_single_video(self, videoID):#video Id should be a string
+
+    def __getitem__(self, index):
         #first count the number of frames in the folder
-        video_path = datasets_path["SomethingData"] + videoID + "/"
+        video_path = datasets_path["SomethingData"] + self.training_list[index] + "/"
         all_files = os.listdir(video_path)
         selected_files = random.sample(all_files, number_of_frames_per_video)
         selected_files.sort()#all the selected files are in ascending order
@@ -141,33 +129,11 @@ class somethingBatch():
         #add extra axis
         minivideo_transformed = minivideo_transformed.unsqueeze_(0).view(-1,3,224,224).contiguous()
 
+        label = torch.LongTensor([self.training_sample[self.training_list[index]]])
         
-        return minivideo_transformed
+        return {"images":minivideo_transformed, "labels":label}
 
 
-    def get_training_batch(self, batch_size):#batch size indicates how many videos in a batch not the number of frames
-        #data = []
-        #gt = [0] * batch_size
-        #for i in range(batch_size):
-        #    gt[i] = self.training_sample[self.training_list[self.last_sample_pos]]
-        #    data.append(self._sample_single_video(self.training_list[self.last_sample_pos]))
-        
-        ids = []
-        gt = []
-        for i in range(batch_size):
-            ids.append(self.training_list[(self.last_sample_pos + i) % self.training_sample_number])
-            gt.append(self.training_sample[self.training_list[(self.last_sample_pos + i) % self.training_sample_number]])
-        start = time.time()
-        pool = mp.Pool(processes=12)
-        data = pool.map(self._sample_single_video, ids)
-        print("multiprocessing time {}".format(time.time()-start))
-        data = torch.cat(data)
-        gt = torch.LongTensor(gt)
-        data = data.type(torch.float)
-
-        self.last_sample_pos = (self.last_sample_pos + batch_size) % self.training_sample_number
-        self.trained_ratio += batch_size/self.training_sample_number
-        return data, gt
 
 
         
