@@ -42,7 +42,7 @@ else:
 #get data generator
 something_loader = torch.utils.data.DataLoader(
     somethingBatch(datasets_path["SomethingLabel"],datasets_path["SomethingTrain"], datasets_path["SomethingData"]),
-    batch_size=args.batch_size, shuffle=True, pin_memory=True, number_workers=12)
+    batch_size=args.batch_size, shuffle=True, pin_memory=True, num_workers=12)
 
 #use multigpu or not
 if (torch.cuda.device_count() > 1) and (args.multigpu == True):
