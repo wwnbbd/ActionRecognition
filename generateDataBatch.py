@@ -159,7 +159,7 @@ class somethingBatch():
             gt.append(self.training_sample[self.training_list[(self.last_sample_pos + i) % self.training_sample_number]])
         start = time.time()
         #pool = mp.Pool(processes=12)
-        data = pool.map(self._sample_single_video, ids)
+        data = self.pool.map(self._sample_single_video, ids)
         print("multiprocessing time {}".format(time.time()-start))
         data = torch.cat(data)
         gt = torch.LongTensor(gt)
