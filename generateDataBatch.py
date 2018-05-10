@@ -5,6 +5,7 @@ from skimage import io,transform
 import numpy as np
 from torchvision import transforms
 import torch
+import time 
 
 #basic transform class
 class Rescale(object):
@@ -120,9 +121,12 @@ class somethingBatch():
         selected_files.sort()#all the selected files are in ascending order
 
         #read in all the sampled frames
+        start = time.time()
         minivideo = io.imread(video_path + selected_files[0])#shape: height * width * channel
         for i in range(1,len(selected_files)):
             minivideo = np.concatenate((minivideo, io.imread(video_path + selected_files[i])),axis=2)
+        end = time.time()
+        print("read images using {} seconds".format(end-start))
 
         rescale = Rescale(256)
         crop = RandomCrop(224)
