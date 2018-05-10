@@ -42,7 +42,7 @@ else:
 #get data generator
 something_loader = torch.utils.data.DataLoader(
     somethingBatch(datasets_path["SomethingLabel"],datasets_path["SomethingTrain"], datasets_path["SomethingData"]),
-    batch_size=args.batch_size, shuffle=True, pin_memory=True, num_workers=12)
+    batch_size=args.batch_size, shuffle=True, pin_memory=True, num_workers=32)
 
 #use multigpu or not
 if (torch.cuda.device_count() > 1) and (args.multigpu == True):
@@ -81,13 +81,11 @@ for i in range(args.epoch):
         optimizer.step()
 
         end = time.time()
-        print("epoch:{}---iter:{}---time:{}".format(i,batch_number,end-start))
-
-
+        print("epoch:{}---iter:{}---time:{} \n".format(i,batch_number,end-start))
 
         #save parameters
-        if i % args.check_iter == 0:
-            parameter_path = check_points_path + str(i) +".pth"
+        if batch_number % args.check_iter == 0:
+            parameter_path = check_points_path + str(i) + "-" + str(batch_number)+".pth"
             save_checkpoint(model_something, parameter_path)
 
         #change learning rate
