@@ -6,6 +6,7 @@ import numpy as np
 from torchvision import transforms
 import torch
 import multiprocessing as mp
+import time
 
 #basic transform class
 class Rescale(object):
@@ -80,7 +81,7 @@ class somethingBatch():
         self.trained_ratio = 0 #trained sample number divide total training sample number, may > 1.0
         self.training_list = list(self.training_sample.keys())
         self.validation_list = list(self.validation_sample.keys())
-
+        self.pool = mp.Pool(processes=12)
 
     def _parse_labels(self, label):
         eng2num = dict()#generate dict
@@ -156,10 +157,10 @@ class somethingBatch():
         for i in range(batch_size):
             ids.append(self.training_list[(self.last_sample_pos + i) % self.training_sample_number])
             gt.append(self.training_sample[self.training_list[(self.last_sample_pos + i) % self.training_sample_number]])
-
-        pool = mp.Pool(processes=batch_size)
+        start = time.time()
+        #pool = mp.Pool(processes=12)
         data = pool.map(self._sample_single_video, ids)
-        
+        print("multiprocessing time {}".format(time.time()-start))
         data = torch.cat(data)
         gt = torch.LongTensor(gt)
         data = data.type(torch.float)
