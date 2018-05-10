@@ -135,13 +135,17 @@ class somethingBatch():
         minivideo = crop(minivideo)
         if random.random() > 0.5:
             minivideo = minivideo[:,::-1,:].copy()
+        trans1 = time.time()
+        print("transforms {} seconds".format(trans1 - end))
+
+        
         #minivideo shape: height * width * channel (also PIL image format)
         tsfm = transforms.Compose([transforms.ToTensor(), transforms.Normalize(mean=[0.485, 0.456, 0.406]*15, std=[0.229, 0.224, 0.225]*15)])
         #torch tensor default require grad is false
         minivideo_transformed = tsfm(minivideo)#normalization mean and std which is from imagenet
         #add extra axis
         minivideo_transformed = minivideo_transformed.unsqueeze_(0).view(-1,3,224,224).contiguous()
-
+        print("trans2 {} seconds".format(time.time() - trans1))
         self.last_sample_pos = (self.last_sample_pos + 1) % self.training_sample_number
         self.trained_ratio += 1/self.training_sample_number
         return minivideo_transformed
