@@ -59,7 +59,7 @@ optimizer = optim.Adam(model_something.parameters(), lr=args.lr,weight_decay=0.0
 criterion = nn.CrossEntropyLoss()
 
 #training
-for i in range args.epoch:
+for i in range(args.epoch):
     for batch_number, batch_data in enumerate(something_loader):
         start = time.time()
         optimizer.zero_grad()
