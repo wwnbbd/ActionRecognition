@@ -61,7 +61,7 @@ criterion = nn.CrossEntropyLoss()
 #training
 for i in range(args.epoch):
     #change learning rate for every epoch
-    optimizer = optim.Adam(model_something.parameters(), lr=args.lr*pow(10,i),weight_decay=0.00001)
+    #optimizer = optim.Adam(model_something.parameters(), lr=args.lr*pow(10,i),weight_decay=0.00001)
 
     for batch_number, batch_data in enumerate(something_loader):
         start = time.time()
