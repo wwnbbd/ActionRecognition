@@ -9,6 +9,7 @@ from torch.utils.data import Dataset, DataLoader
 import time
 import warnings
 import numbers
+import torchvision
 warnings.filterwarnings("ignore")
 
 #basic transform class
@@ -126,7 +127,7 @@ class somethingBatch(Dataset):
         
         tsfm = transforms.Compose([transforms.ToTensor(), transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])])
         #torch tensor default require grad is false
-        minivideo = map(tsfm, minivideo)#normalization mean and std which is from imagenet
+        minivideo = list(map(tsfm, minivideo))#normalization mean and std which is from imagenet
         #add extra axis torch stack will add new axis to dim 0
         minivideo = torch.stack(minivideo).contiguous()
 
