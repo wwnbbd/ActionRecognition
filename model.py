@@ -189,7 +189,7 @@ class Net(nn.Module):
         high_2d = self.relu(high_2d)
         high_2d = self.high_average_pool(high_2d)   #batch size = fake_batch_size / frames_per_video
 
-        #space
+        #space (B*15)*2048*1*1
         space_out = self.space_final(res_out[2].view(-1,2048))
         space_out = self.space_final_dropout(space_out)
         space_out = space_out.contiguous().view(-1,self.frames_per_video,self.output_channel).contiguous()
