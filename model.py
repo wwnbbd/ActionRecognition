@@ -112,21 +112,47 @@ class Net(nn.Module):
         for i in range(int(fake_batch_size/self.frames_per_video)):
             start_index = i * self.frames_per_video
             end_index = start_index + self.frames_per_video - 1
+            #the length of the list is the real batch of video
+            #every item in the list should be the size of 14 * C * H * W
             low_level_subtraction_list.append(low_level_subtraction[start_index:end_index,:,:,:])
             high_level_subtraction_list.append(high_level_subtraction[start_index:end_index,:,:,:])
-        low_level_subtraction_valid = torch.cat(low_level_subtraction_list, dim=0).contiguous()
-        high_level_subtraction_valid = torch.cat(high_level_subtraction_list, dim=0).contiguous()
+        #size realbatch * 14 * C *H *W
+        low_level_subtraction_valid = torch.stack(low_level_subtraction_list)
+        high_level_subtraction_valid = torch.stack(high_level_subtraction_list)
+
+        #view
+        assert low_level_subtraction_valid.size()[-1] == 28
+        assert high_level_subtraction_valid.size()[-1] == 14
+        assert low_level_subtraction_valid.size()[-3] == 512
+        assert high_level_subtraction_valid.size()[-3] == 1024
+        low_level_subtraction_valid = low_level_subtraction_valid.view(-1,512,28,28)
+        high_level_subtraction_valid = high_level_subtraction_valid.view(-1,1024,14,14)
 
         #conv the valid subtraction
         valid_low_sub_conv = self.sub_conv_low(low_level_subtraction_valid)
         valid_high_sub_conv = self.sub_conv_high(high_level_subtraction_valid)
 
-        #Doing sum
-        low_sum_x = valid_low_sub_conv.sum(-1).unsqueeze(-1)#W column B*C*H*1
-        low_sum_y = valid_low_sub_conv.sum(-2).unsqueeze(-2)#H row B*C*1*W
-        high_sum_x = valid_high_sub_conv.sum(-1).unsqueeze(-1)#W
-        high_sum_y = valid_high_sub_conv.sum(-2).unsqueeze(-2)#H
+        valid_low_sub_conv = valid_low_sub_conv.view(-1,14,512,28,28)
+        valid_high_sub_conv = valid_high_sub_conv.view(-1,14,1024,14,14)
 
+        #Doing sum
+        low_sum_x = torch.sum(valid_low_sub_conv,-1,keepdim=False)#keep x B*14*512*28
+        low_sum_y = torch.sum(valid_low_sub_conv,-2,keepdim=False)#keep y B*14*512*28
+        high_sum_x = torch.sum(valid_high_sub_conv,-1,keepdim=False)#keep x B*14*1024*14
+        high_sum_y = torch.sum(valid_high_sub_conv,-2,keepdim=False)#keep y B*14*1024*14
+
+        #new to 2D
+        low_2d = []
+        high_2d = []
+        for i in range(self.frames_per_video-1):
+            low_2d.append(low_sum_x[:,i,:,:].unsqueeze(-1))
+            low_2d.append(low_sum_y[:,i,:,:].unsqueeze(-1))
+            high_2d.append(high_sum_x[:,i,:,:].unsqueeze(-1))
+            high_2d.append(high_sum_y[:,i,:,:].unsqueeze(-1))
+        low_2d = torch.cat(low_2d,dim=-1)#B*512*28*28
+        high_2d = torch.cat(high_2d,dim=-1)#B*1024*14*28
+
+        '''
         #video to 2D
         low_sum_y = torch.transpose(low_sum_y, -1, -2)
         high_sum_y = torch.transpose(high_sum_y, -1, -2)
@@ -136,6 +162,7 @@ class Net(nn.Module):
 
         low_2d = low_2d.view(-1,512,28,(self.frames_per_video-1)*2).contiguous()
         high_2d = high_2d.view(-1,1024,14,(self.frames_per_video-1)*2).contiguous()
+        '''
 
         #low level branch
         low_2d = self.low_layer_node_1(low_2d)
