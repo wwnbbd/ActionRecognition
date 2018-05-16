@@ -1,72 +1,74 @@
 from config import *
 import os
 import random
-from skimage import io,transform
+from PIL import Image,ImageOps
 import numpy as np
 from torchvision import transforms
 import torch
 from torch.utils.data import Dataset, DataLoader
 import time
 import warnings
+import numbers
 warnings.filterwarnings("ignore")
 
 #basic transform class
-class Rescale(object):
-    """Rescale the image in a sample to a given size.
+class GroupRandomCrop(object):
+    def __init__(self, size):
+        if isinstance(size, numbers.Number):
+            self.size = (int(size), int(size))
+        else:
+            self.size = size
 
-    Args:
-        output_size (tuple or int): Desired output size. If tuple, output is
-            matched to output_size. If int, smaller of image edges is matched
-            to output_size keeping aspect ratio the same.
-    """
+    def __call__(self, img_group):
 
-    def __init__(self, output_size):
-        assert isinstance(output_size, (int, tuple))
-        self.output_size = output_size
+        w, h = img_group[0].size
+        th, tw = self.size
 
-    def __call__(self, image):
-        h, w = image.shape[:2]
-        if isinstance(self.output_size, int):
-            if h > w:
-                new_h, new_w = self.output_size * h / w, self.output_size
+        out_images = list()
+
+        x1 = random.randint(0, w - tw)
+        y1 = random.randint(0, h - th)
+
+        for img in img_group:
+            assert(img.size[0] == w and img.size[1] == h)
+            if w == tw and h == th:
+                out_images.append(img)
             else:
-                new_h, new_w = self.output_size, self.output_size * w / h
-        else:
-            new_h, new_w = self.output_size
+                out_images.append(img.crop((x1, y1, x1 + tw, y1 + th)))
 
-        new_h, new_w = int(new_h), int(new_w)
+        return out_images
 
-        img = transform.resize(image, (new_h, new_w))
-
-        return img
-
-class RandomCrop(object):
-    """Crop randomly the image in a sample.
-
-    Args:
-        output_size (tuple or int): Desired output size. If int, square crop
-            is made.
+class GroupScale(object):
+    """ Rescales the input PIL.Image to the given 'size'.
+    'size' will be the size of the smaller edge.
+    For example, if height > width, then image will be
+    rescaled to (size * height / width, size)
+    size: size of the smaller edge
+    interpolation: Default: PIL.Image.BILINEAR
     """
 
-    def __init__(self, output_size):
-        assert isinstance(output_size, (int, tuple))
-        if isinstance(output_size, int):
-            self.output_size = (output_size, output_size)
+    def __init__(self, size, interpolation=Image.BILINEAR):
+        self.worker = torchvision.transforms.Resize(size, interpolation)
+
+    def __call__(self, img_group):
+        return [self.worker(img) for img in img_group]
+
+class GroupRandomHorizontalFlip(object):
+    """Randomly horizontally flips the given PIL.Image with a probability of 0.5
+    """
+    def __init__(self, is_flow=False):
+        self.is_flow = is_flow
+
+    def __call__(self, img_group, is_flow=False):
+        v = random.random()
+        if v < 0.5:
+            ret = [img.transpose(Image.FLIP_LEFT_RIGHT) for img in img_group]
+            if self.is_flow:
+                for i in range(0, len(ret), 2):
+                    ret[i] = ImageOps.invert(ret[i])  # invert flow pixel values when flipping
+            return ret
         else:
-            assert len(output_size) == 2
-            self.output_size = output_size
-
-    def __call__(self, image):
-        h, w = image.shape[:2]
-        new_h, new_w = self.output_size
-
-        top = np.random.randint(0, h - new_h)
-        left = np.random.randint(0, w - new_w)
-
-        image = image[top: top + new_h,
-                      left: left + new_w]
-
-        return image
+            return img_group
 
 
 
@@ -110,28 +112,33 @@ class somethingBatch(Dataset):
         selected_files.sort()#all the selected files are in ascending order
 
         #read in all the sampled frames
-        minivideo = io.imread(video_path + selected_files[0])#shape: height * width * channel
-        for i in range(1,len(selected_files)):
-            minivideo = np.concatenate((minivideo, io.imread(video_path + selected_files[i])),axis=2)
+        minivideo = []
+        for i in range(len(selected_files)):
+            minivideo.append(Image.open(video_path + selected_files[i]))
 
-        rescale = Rescale(256)
-        crop = RandomCrop(224)
+        rescale = GroupScale(256)
+        crop = GroupRandomCrop(224)
+        flip = GroupRandomHorizontalFlip()
 
         minivideo = rescale(minivideo)
         minivideo = crop(minivideo)
-        if random.random() > 0.5:
-            minivideo = minivideo[:,::-1,:].copy()
+        minivideo = filp(minivideo)
         
-        #minivideo shape: height * width * channel (also PIL image format)
         tsfm = transforms.Compose([transforms.ToTensor(), transforms.Normalize(mean=[0.485, 0.456, 0.406]*15, std=[0.229, 0.224, 0.225]*15)])
         #torch tensor default require grad is false
-        minivideo_transformed = tsfm(minivideo)#normalization mean and std which is from imagenet
-        #add extra axis
-        minivideo_transformed = minivideo_transformed.unsqueeze_(0).view(-1,3,224,224).contiguous()
+        minivideo = map(tsfm, minivideo)#normalization mean and std which is from imagenet
+        #add extra axis torch stack will add new axis to dim 0
+        minivideo = torch.stack(minivideo).contiguous()
 
         label = torch.LongTensor([self.training_sample[self.training_list[index]]])
-        
-        return {"images":minivideo_transformed, "labels":label}
+        #the shape of minivideo is 15 * 3 *224 *224
+        return {"images":minivideo, "labels":label}
+
+'''
+test = somethingBatch(datasets_path["SomethingLabel"],datasets_path["SomethingTrain"],datasets_path["SomethingData"])
+print(test.training_sample["100218"])
+print(test.training_sample["48032"])
+'''
 
 
 
