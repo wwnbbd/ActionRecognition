@@ -122,16 +122,16 @@ class somethingBatch(Dataset):
 
         minivideo = rescale(minivideo)
         minivideo = crop(minivideo)
-        minivideo = filp(minivideo)
+        minivideo = flip(minivideo)
         
-        tsfm = transforms.Compose([transforms.ToTensor(), transforms.Normalize(mean=[0.485, 0.456, 0.406]*15, std=[0.229, 0.224, 0.225]*15)])
+        tsfm = transforms.Compose([transforms.ToTensor(), transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])])
         #torch tensor default require grad is false
         minivideo = map(tsfm, minivideo)#normalization mean and std which is from imagenet
         #add extra axis torch stack will add new axis to dim 0
         minivideo = torch.stack(minivideo).contiguous()
 
         label = torch.LongTensor([self.training_sample[self.training_list[index]]])
-        #the shape of minivideo is 15 * 3 *224 *224
+        #the shape of minivideo is 15 * 3 *224 *224 the order is obtained
         return {"images":minivideo, "labels":label}
 
 '''
