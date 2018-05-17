@@ -76,7 +76,7 @@ for i in range(args.epoch):
         if (input_data.size()[0] / 2) != 0:
             continue 
 
-        input_data = input_data.to(device)
+        input_data = input_data.to(device)#把view操作放在forward函数中进行
         target_data = target_data.to(device).view(-1)
 
         low_out, high_out, space_out = model_something(input_data)
@@ -94,7 +94,11 @@ for i in range(args.epoch):
         #save parameters
         if batch_number % args.check_iter == 0:
             parameter_path = check_points_path + str(i) + "-" + str(batch_number)+".pth"
-            save_checkpoint(model_something, parameter_path)
+            #多GPU情况下的保存要做特殊处理
+            if args.multigpu:
+                save_checkpoint(model_something.module, parameter_path)
+            else:
+                save_checkpoint(model_something, parameter_path)
 
 
 
