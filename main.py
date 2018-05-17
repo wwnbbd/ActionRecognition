@@ -68,11 +68,16 @@ for i in range(args.epoch):
         optimizer.zero_grad()
 
         input_data,target_data = batch_data["images"],batch_data["labels"]
-        input_data = input_data.view(-1,3,224,224).contiguous().type(torch.float32)
-        target_data = target_data.view(-1).contiguous()
+        input_data = input_data.type(torch.float32)#delete contiguous
+
+        ##!!!!!!!!!!!!MUST BE TRANSFERED TO DEVICE AND THEN VIEW
+        #否则顺序会乱
+
+        if (input_data.size()[0] / 2) != 0:
+            continue 
 
         input_data = input_data.to(device)
-        target_data = target_data.to(device)
+        target_data = target_data.to(device).view(-1)
 
         low_out, high_out, space_out = model_something(input_data)
         loss_low = criterion(low_out,target_data)

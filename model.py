@@ -92,6 +92,7 @@ class Net(nn.Module):
 
 
     def forward(self,x):
+        x = x.view(-1,3,224,224)
         res_out = self.basenet(x)#feed into basenet
 
         low_level_feature = res_out[0]#getting low and high level features
