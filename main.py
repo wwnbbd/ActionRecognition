@@ -73,7 +73,7 @@ for i in range(args.epoch):
         ##!!!!!!!!!!!!MUST BE TRANSFERED TO DEVICE AND THEN VIEW
         #否则顺序会乱
 
-        if (input_data.size()[0] / 2) != 0:
+        if (input_data.size()[0] % 2) != 0:
             continue 
 
         input_data = input_data.to(device)#把view操作放在forward函数中进行
