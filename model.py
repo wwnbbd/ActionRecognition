@@ -118,7 +118,7 @@ class Net(nn.Module):
             low_level_subtraction_list.append(low_level_subtraction[start_index:end_index,:,:,:])
             high_level_subtraction_list.append(high_level_subtraction[start_index:end_index,:,:,:])
         #size realbatch * 14 * C *H *W
-        low_level_subtraction_valid = torch.stack(low_level_subtraction_list)
+        low_level_subtraction_valid = torch.stack(low_level_subtraction_list) #stack 是创造一个新的axis cat是在一个已经存在的axis上进行的，这是两个函数的区别
         high_level_subtraction_valid = torch.stack(high_level_subtraction_list)
 
         #view
