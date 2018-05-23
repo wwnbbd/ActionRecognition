@@ -79,11 +79,10 @@ for i in range(args.epoch):
         input_data = input_data.to(device)#把view操作放在forward函数中进行
         target_data = target_data.to(device).view(-1)
 
-        low_out, high_out, space_out = model_something(input_data)
+        low_out, space_out = model_something(input_data)
         loss_low = criterion(low_out,target_data)
-        loss_high = criterion(high_out,target_data)
         loss_space = criterion(space_out,target_data)
-        loss = args.loss_ratio_temporal*loss_low + args.loss_ratio_temporal*loss_high + args.loss_ratio_space*loss_space
+        loss = args.loss_ratio_temporal*loss_low + args.loss_ratio_space*loss_space
         loss.backward()
         print(loss.item())
         optimizer.step()
