@@ -56,7 +56,7 @@ model_something.to(device)
 optimizer = optim.Adam(model_something.parameters(), lr=args.lr,weight_decay=0.00001)
 
 #define loss function
-criterion = nn.CrossEntropyLoss()
+criterion = nn.CrossEntropyLoss().to(device)
 
 #training
 for i in range(args.epoch):
