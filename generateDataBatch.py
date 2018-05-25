@@ -137,9 +137,10 @@ class somethingBatch(Dataset):
 
 '''
 test = somethingBatch(datasets_path["SomethingLabel"],datasets_path["SomethingTrain"],datasets_path["SomethingData"])
-print(test.training_sample["100218"])
-print(test.training_sample["48032"])
+print(test.training_sample["58699"])
+print(test.training_sample["60584"])
 '''
+
 
 
 

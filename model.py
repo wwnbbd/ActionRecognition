@@ -67,7 +67,7 @@ class Net(nn.Module):
         self.low_last_conv = nn.Conv2d(512*4, self.output_channel, kernel_size=3, stride=1)
         self.low_average_pool = nn.AvgPool2d(4)
         self.space_final = nn.Linear(2048,self.output_channel)
-        self.space_final_dropout = nn.Dropout(self.dropout_ratio)
+        #self.space_final_dropout = nn.Dropout(self.dropout_ratio)
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
@@ -142,7 +142,7 @@ class Net(nn.Module):
 
         #space (B*15)*2048*1*1
         space_out = self.space_final(res_out[2].view(-1,2048))
-        space_out = self.space_final_dropout(space_out)
+        #space_out = self.space_final_dropout(space_out)#似乎有问题？？？？？
         space_out = space_out.contiguous().view(-1,self.frames_per_video,self.output_channel).contiguous()
         space_out = space_out.mean(-2)
         return low_2d.squeeze_(-1).squeeze_(-1), space_out       
