@@ -53,12 +53,13 @@ if (torch.cuda.device_count() > 1) and (args.multigpu == True):
 model_something.to(device)
 
 #define optimzer
-optimizer = optim.Adam(model_something.parameters(), lr=args.lr,weight_decay=0.00001)
+optimizer = optim.SGD(model_something.parameters(), lr=args.lr, momentum=0.9, weight_decay=0.00001)
 
 #define loss function
 criterion = nn.CrossEntropyLoss().to(device)
 
 #training
+loss_list = []
 for i in range(args.epoch):
     #change learning rate for every epoch
     #optimizer = optim.Adam(model_something.parameters(), lr=args.lr*pow(10,i),weight_decay=0.00001)
@@ -84,11 +85,14 @@ for i in range(args.epoch):
         loss_space = criterion(space_out,target_data)
         loss = args.loss_ratio_temporal*loss_low + args.loss_ratio_space*loss_space
         loss.backward()
-        print(loss.item())
+        #print(loss.item())
+        loss_list.append(loss.item())
         optimizer.step()
-
         end = time.time()
-        print("epoch:{}---iter:{}---time:{} \n".format(i,batch_number,end-start))
+        
+        if (batch_number%100) == 0:
+            print(sum(loss_list)/len(loss_list)        
+            print("epoch:{}---iter:{}---time:{} \n".format(i,batch_number,end-start))
 
         #save parameters
         if batch_number % args.check_iter == 0:
