@@ -14,11 +14,11 @@ from config import datasets #config
 class Temporal(nn.Module):#in fact is a bottleneck
     def __init__(self, input_num):
         super(Temporal, self).__init__()
-        self.conv1 = nn.Conv2d(input_num, int(input_num/4), kernel_size=1, stride=1)
+        self.conv1 = nn.Conv2d(input_num, int(input_num/4), kernel_size=1, stride=1, bias=False)
         self.bn1 = nn.BatchNorm2d(int(input_num/4))
-        self.conv2 = nn.Conv2d(int(input_num/4), int(input_num/4), kernel_size=3, stride=1, padding=1)
+        self.conv2 = nn.Conv2d(int(input_num/4), int(input_num/4), kernel_size=3, stride=1, padding=1, bias=False)
         self.bn2 = nn.BatchNorm2d(int(input_num/4))
-        self.conv3 = nn.Conv2d(int(input_num/4), input_num, kernel_size=1, stride=1)
+        self.conv3 = nn.Conv2d(int(input_num/4), input_num, kernel_size=1, stride=1, bias=False)
         self.bn3 = nn.BatchNorm2d(input_num)
         self.relu = nn.ReLU(inplace=True)
     def forward(self, x):
@@ -56,11 +56,11 @@ class Net(nn.Module):
     
         #Temple branch one low level feature
         self.low_layer_node_1 = Temporal(512)
-        self.low_subsample_1 = nn.Conv2d(512, 512*2, kernel_size=1, stride=2)
+        self.low_subsample_1 = nn.Conv2d(512, 512*2, kernel_size=1, stride=2, bias=False)
         self.low_subsample_1_bn = nn.BatchNorm2d(512*2)
 
         self.low_layer_node_2 = Temporal(512*2)
-        self.low_subsample_2 = nn.Conv2d(512*2, 512*4, kernel_size=1, stride=2)
+        self.low_subsample_2 = nn.Conv2d(512*2, 512*4, kernel_size=1, stride=2, biase=False)
         self.low_subsample_2_bn = nn.BatchNorm2d(512*4)            
 
         #dataset specific layers        
