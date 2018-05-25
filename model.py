@@ -60,7 +60,7 @@ class Net(nn.Module):
         self.low_subsample_1_bn = nn.BatchNorm2d(512*2)
 
         self.low_layer_node_2 = Temporal(512*2)
-        self.low_subsample_2 = nn.Conv2d(512*2, 512*4, kernel_size=1, stride=2, biase=False)
+        self.low_subsample_2 = nn.Conv2d(512*2, 512*4, kernel_size=1, stride=2, bias=False)
         self.low_subsample_2_bn = nn.BatchNorm2d(512*4)            
 
         #dataset specific layers        
