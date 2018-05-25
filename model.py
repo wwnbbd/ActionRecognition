@@ -41,12 +41,12 @@ class Temporal(nn.Module):#in fact is a bottleneck
 
 
 class Net(nn.Module):
-    def __init__(self, frames_per_video = 15, dataset_name = "UCF",dropout_ratio=0.7):
+    def __init__(self, frames_per_video = 15, dataset_name = "UCF"):
         super(Net, self).__init__()
         self.frames_per_video = frames_per_video
         self.dataset_name = dataset_name
         self.output_channel = datasets[dataset_name]
-        self.dropout_ratio = dropout_ratio
+        #self.dropout_ratio = dropout_ratio
 
         self.relu = nn.ReLU()
         self.basenet = resnet50(pretrained=False)

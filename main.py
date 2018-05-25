@@ -33,7 +33,7 @@ args = parser.parse_args()
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 #get model
-model_something = Net(dataset_name="Something",dropout_ratio=0.7)
+model_something = Net(dataset_name="Something")
 if args.pretrain == "resnet50":
     load_pretrain_model(model_something)
 else:
