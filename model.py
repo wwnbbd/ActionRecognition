@@ -66,7 +66,7 @@ class Net(nn.Module):
         #dataset specific layers        
         self.low_last_conv = nn.Conv2d(512*4, self.output_channel, kernel_size=3, stride=1)
         self.low_average_pool = nn.AvgPool2d(4)
-        self.space_final = nn.Linear(2048,self.output_channel)
+        self.space_final = nn.Linear(1000,self.output_channel)#add fc layer to better transfer
         #self.space_final_dropout = nn.Dropout(self.dropout_ratio)
 
         for m in self.modules():
@@ -116,8 +116,8 @@ class Net(nn.Module):
         valid_low_sub_conv = valid_low_sub_conv.view(-1,14,512,28,28)
 
         #Doing sum
-        low_sum_x = torch.sum(valid_low_sub_conv,-1,keepdim=False)#keep x B*14*512*28
-        low_sum_y = torch.sum(valid_low_sub_conv,-2,keepdim=False)#keep y B*14*512*28
+        low_sum_x = torch.sum(valid_low_sub_conv,-1,keepdim=False)#keep x B*14*512*28(H)
+        low_sum_y = torch.sum(valid_low_sub_conv,-2,keepdim=False)#keep y B*14*512*28(W)
 
         #new to 2D
         low_2d = []
@@ -140,8 +140,8 @@ class Net(nn.Module):
         low_2d = self.relu(low_2d)
         low_2d = self.low_average_pool(low_2d) #batch size = fake_batch_size / frames_per_video
 
-        #space (B*15)*2048*1*1
-        space_out = self.space_final(res_out[2].view(-1,2048))
+        #space (B*15)*1000
+        space_out = self.space_final(self.relu(res_out[2]))
         #space_out = self.space_final_dropout(space_out)#似乎有问题？？？？？
         space_out = space_out.contiguous().view(-1,self.frames_per_video,self.output_channel).contiguous()
         space_out = space_out.mean(-2)

@@ -108,6 +108,7 @@ class ResNet(nn.Module):
         self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
         self.layer4 = self._make_layer(block, 512, layers[3], stride=2)#output 2048 maps
         self.avgpool = nn.AvgPool2d(7, stride=1)#deleted the final fc layer
+        self.fc = nn.Linear(2048,1000)
         
 
         for m in self.modules():
@@ -149,6 +150,8 @@ class ResNet(nn.Module):
         intermaps.append(x)
         x = self.layer4(x)
         x = self.avgpool(x)
+        x = x.view(-1,2048)
+        x = self.fc(x)
         intermaps.append(x)
 
         return intermaps #contains layer3 layer2 and average pooling's output
