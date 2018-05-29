@@ -39,11 +39,14 @@ top5 = 0
 total = 0
 with torch.set_grad_enabled(False):
     for batch_number,batch_data in enumerate(something_validation_loader):
+        print("----{}----".format(batch_number))
         input_data, target_data = batch_data["images"], batch_data["labels"]
         target_data = target_data.view(-1)
+        input_data = input_data.to(device)
+        target_data = target_data.to(device)
         total += target_data.size()[0]
         low_out, space_out = testSomething(input_data)
-        index = torch.sort(space_out, 0, decending=True)[1]
+        index = torch.sort(space_out, 0, descending=True)[1]
         for i in range(5):
             if i == 0:
                 top1 += torch.sum(index[1][i] == target_data).item()
