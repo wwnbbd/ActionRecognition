@@ -46,11 +46,15 @@ with torch.set_grad_enabled(False):
         target_data = target_data.to(device)
         total += target_data.size()[0]
         low_out, space_out = testSomething(input_data)
-        index = torch.sort(space_out, 0, descending=True)[1]
+        index = torch.sort(space_out, 1, descending=True)[1]
         for i in range(5):
             if i == 0:
-                top1 += torch.sum(index[1][i] == target_data).item()
-                top5 += torch.sum(index[1][i] == target_data).item()
+                top1 += torch.sum(index[:,i] == target_data).item()
+                top5 += torch.sum(index[:,i] == target_data).item()
             else:
-                top5 += torch.sum(index[1][i] == target_data).item()
-
+                top5 += torch.sum(index[:,i] == target_data).item()
+print(top1)
+print(top5)
+print(total)
+print("-----top1-----{}".format(top1/total))
+print("-----top5-----{}".format(top5/total))
