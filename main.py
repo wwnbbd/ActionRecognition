@@ -93,6 +93,7 @@ for i in range(args.epoch):
         if (batch_number%100) == 0:
             print(sum(loss_list)/len(loss_list))        
             print("epoch:{}---iter:{}---time:{} \n".format(i,batch_number,end-start))
+            loss_list = []
 
         #save parameters
         if batch_number % args.check_iter == 0:
