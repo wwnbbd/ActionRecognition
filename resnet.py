@@ -108,8 +108,7 @@ class ResNet(nn.Module):
         self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
         self.layer4 = self._make_layer(block, 512, layers[3], stride=2)#output 2048 maps
         self.avgpool = nn.AvgPool2d(7, stride=1)#deleted the final fc layer
-        self.fc = nn.Linear(2048,1000)
-        
+        self.fc = nn.Linear(2048, 1000)
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
