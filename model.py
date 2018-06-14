@@ -116,8 +116,15 @@ class Net(nn.Module):
         valid_low_sub_conv = valid_low_sub_conv.view(-1,14,512,28,28)
 
         #Doing sum
-        low_sum_x = torch.sum(valid_low_sub_conv,-1,keepdim=False)#keep x B*14*512*28(H)
-        low_sum_y = torch.sum(valid_low_sub_conv,-2,keepdim=False)#keep y B*14*512*28(W)
+        #low_sum_x = torch.sum(valid_low_sub_conv,-1,keepdim=False)#keep x B*14*512*28(H)
+        #low_sum_y = torch.sum(valid_low_sub_conv,-2,keepdim=False)#keep y B*14*512*28(W)
+
+        #Doing max
+        low_max_x = torch.max(valid_low_sub_conv,-1,keepdim=False)[0]
+        low_max_y = torch.max(valid_low_sub_conv,-2,keepdim=False)[0]
+        low_sum_x = low_max_x
+        low_sum_y = low_max_y
+        
 
         #new to 2D
         low_2d = []
